@@ -2,9 +2,9 @@
 
 namespace Contracts;
 
-public record Shortcut : ILinkableItem
+public class Shortcut : ILinkableItem
 {
-    public string WidgetKey { get; set; }
+    public Guid WidgetKey => Guid.NewGuid();
 
     public Icon Icon { get; set; }
 

@@ -4,6 +4,7 @@ using Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -11,20 +12,23 @@ namespace WebApi.Controllers
     [ApiController]
     public class GetCController : ControllerBase
     {
-
+        private readonly CardService _cardService;
         private readonly IConfiguration _configuration;
 
-        public GetCController(IConfiguration configuration)
+        public GetCController(IConfiguration configuration, CardService cardService)
         {
             _configuration = configuration;
+            _cardService = cardService;
         }
 
         [HttpGet()]
-        public IActionResult Get([FromServices] IOptions<Settings> settings)
+        public async Task<IActionResult> Get([FromServices] IOptions<Settings> settings)
         {
-            var a = settings.Value;
-            
-            return Ok();
+
+            var card = await _cardService.GetCardAsync();
+            //var a = settings.Value;
+            //var c = new Card();
+            return Ok(card);
         }
     }
 }
