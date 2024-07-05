@@ -11,13 +11,20 @@ namespace WebApi.Models
 
         }
 
+        public string Type { get; set; }
+
         public Guid CardId { get; set; }
 
         public string Number { get; set; }
 
-        public override List<Shortcut> Shortcuts => Singleton.Instance.Settings.Shortcuts;
+        public override List<Shortcut> Shortcuts { get; set; }
 
-        public override List<Button> Buttons => Singleton.Instance.Settings.Buttons;
+        public override List<Button> Buttons { get; set; }
+
+        public  void SetButtons(List<Button> buttons)
+        {
+            Buttons = buttons;
+        }
 
         public override void AddParams()
         {

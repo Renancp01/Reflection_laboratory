@@ -10,15 +10,15 @@ public class Singleton
 
     public static Singleton Instance => instance.Value;
 
-    public Settings Settings{ get; set; }
+    public Dictionary<string, Config> Settings { get; set; }
 
-    public void SetValue(Settings settings)
+    public void SetValue(Dictionary<string, Config> settings)
     {
         Settings = settings;
     }
 
-    public Settings GetValue()
+    public Config GetValue(string key)
     {
-        return Settings;
+        return Settings.GetValueOrDefault(key);
     }
 }

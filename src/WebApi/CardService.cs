@@ -11,7 +11,7 @@ public class CardService
     private readonly ICardApi _cardApi;
     private readonly IOptions<Settings> _settings;
 
-    public CardService(IConfiguration configuration, ICardApi cardApi)
+    public CardService(ICardApi cardApi)
     {
         _cardApi = cardApi;
     }

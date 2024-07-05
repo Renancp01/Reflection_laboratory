@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json;
 using RestEase.HttpClientFactory;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,23 +30,33 @@ builder.Configuration.AddAzureAppConfiguration(op =>
         .ConfigureRefresh(refreshOptions =>
         {
             refreshOptions.Register("Config:Virtual", refreshAll: true);
+            refreshOptions.Register("Configs", refreshAll: true);
             refreshOptions.SetCacheExpiration(TimeSpan.FromHours(2));
         })
         .UseFeatureFlags();
 });
 
 builder.Services.Configure<Settings>(builder.Configuration.GetSection("Config:Virtual"));
+builder.Services.Configure<Configs>(builder.Configuration.GetSection("Configs"));
+
 builder.Services.AddTransient<CardService>();
 builder.Services.AddAzureAppConfiguration();
 
 builder.Services
-    .AddRestEaseClient<ICardApi>("https://cards.free.beeceptor.com");
+    .AddTransient(_ => new CustomResponseHandler())
+    .AddRestEaseClient<ICardApi>("https://cards.free.beeceptor.com")
+    .ConfigureHttpClient(client =>
+    {
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+    })
+    .AddHttpMessageHandler<CustomResponseHandler>(); ;
 
 builder.Services.AddAzureAppConfiguration();
+var configsSection = builder.Configuration.GetSection("Configs")
+    .Get<IEnumerable<Configs>>()
+    .ToDictionary(cw => cw.Type, cw => cw.Config);
 
-var a = builder.Configuration.GetSection("Config:Virtual").Get<Settings>();
-
-Singleton.Instance.SetValue(a);
+Singleton.Instance.SetValue(configsSection);
 builder.Services.AddTransient<Card>();
 builder.Services.AddEndpointsApiExplorer();
 

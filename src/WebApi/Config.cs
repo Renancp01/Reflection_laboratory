@@ -1,6 +1,10 @@
-﻿namespace WebApi;
+﻿using Contracts;
+
+namespace WebApi;
 
 public class Config
 {
-    //public TYPE Type { get; set; }
+    public List<Shortcut> Shortcuts { get; set; }
+
+    public List<Button> Buttons { get; set; }
 }
