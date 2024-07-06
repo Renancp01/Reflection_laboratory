@@ -1,18 +1,12 @@
-using Azure.Identity;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
+
 using Contracts;
-using Contracts.Extensions;
-using WebApi.Models;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using WebApi;
-using RestEase;
-using Microsoft.Extensions.Configuration;
-using static System.Net.Mime.MediaTypeNames;
-using Newtonsoft.Json;
+
+
 using RestEase.HttpClientFactory;
-using Microsoft.Extensions.DependencyInjection;
+using WebApi.Converters;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,14 +36,28 @@ builder.Services.Configure<Configs>(builder.Configuration.GetSection("Configs"))
 builder.Services.AddTransient<CardService>();
 builder.Services.AddAzureAppConfiguration();
 
+var customJsonSerializerSettings = new JsonSerializerSettings
+{
+    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+    NullValueHandling = NullValueHandling.Ignore,
+    Formatting = Formatting.Indented
+};
+
+customJsonSerializerSettings.Converters.Add(new CardConverter());
+
 builder.Services
-    .AddTransient(_ => new CustomResponseHandler())
-    .AddRestEaseClient<ICardApi>("https://cards.free.beeceptor.com")
+    //.AddTransient(_ => new CustomResponseHandler())
+    //.AddRestEaseClient<ICardApi>("https://cards.free.beeceptor.com")
+    .AddRestEaseClient<ICardApi>(c =>
+    {
+        c.JsonSerializerSettings = customJsonSerializerSettings;
+    })
     .ConfigureHttpClient(client =>
     {
+        client.BaseAddress = new Uri("https://cards.free.beeceptor.com");
         client.DefaultRequestHeaders.Add("Accept", "application/json");
-    })
-    .AddHttpMessageHandler<CustomResponseHandler>(); ;
+    });
+//.AddHttpMessageHandler<CustomResponseHandler>();
 
 builder.Services.AddAzureAppConfiguration();
 var configsSection = builder.Configuration.GetSection("Configs")

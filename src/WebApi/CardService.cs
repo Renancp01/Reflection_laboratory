@@ -22,7 +22,7 @@ public class CardService
         var card = await _cardApi.GetCardAsync();
 
         stop1.Start();
-        card.Process();
+        //card.Process();
         stop1.Stop();
         Console.WriteLine($"tempo: {stop1.ElapsedMilliseconds} ms");
         return card;

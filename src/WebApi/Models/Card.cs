@@ -1,39 +1,22 @@
 ﻿using Contracts;
-using Contracts.Extensions;
 using WebApi.Models;
 
 namespace WebApi.Models
 {
-    public class Card : Base, ICard
+    public class Card : Base
     {
-        public Card()
-        {
-
-        }
-
         public string Type { get; set; }
 
         public Guid CardId { get; set; }
 
         public string Number { get; set; }
-
         public override List<Shortcut> Shortcuts { get; set; }
-
         public override List<Button> Buttons { get; set; }
-
-        public  void SetButtons(List<Button> buttons)
-        {
-            Buttons = buttons;
-        }
-
         public override void AddParams()
         {
-            Shortcuts.FillParamsFromSourceList(this);
-            Buttons.FillParamsFromSourceList(this);
+            throw new NotImplementedException();
         }
     }
-
-    public interface ICard { }
 }
 
 public class CardResponse
@@ -41,25 +24,4 @@ public class CardResponse
     public IEnumerable<Card> CardHolderCards { get; set; }
     public IEnumerable<Card> AdditionalCards { get; set; }
     public IEnumerable<Card> TemporaryCards { get; set; }
-
-    public void Process()
-    {
-        ProcessCards(CardHolderCards);
-        ProcessCards(AdditionalCards);
-        ProcessCards(TemporaryCards);
-    }
-
-    private static void ProcessCards(IEnumerable<Card> cards)
-    {
-        if (cards == null) return;
-        foreach (var card in cards)
-            card.AddParams();
-    }
-}
-
-public class Card1 : ICard
-{
-    public Guid CardId { get; set; }
-
-    public string Number { get; set; }
 }
