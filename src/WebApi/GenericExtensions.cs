@@ -11,11 +11,9 @@ public static class GenericExtensions
 
         foreach (var property in properties)
         {
-            if (property.PropertyType == typeof(List<TItem>))
-            {
-                var items = property.GetValue(obj) as List<TItem>;
-                ProcessItems(items, configProvider);
-            }
+            if (property.PropertyType != typeof(List<TItem>)) continue;
+            var items = property.GetValue(obj) as List<TItem>;
+            ProcessItems(items, configProvider);
         }
     }
 

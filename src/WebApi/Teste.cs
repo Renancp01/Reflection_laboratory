@@ -17,17 +17,14 @@ public class Config
     public string Value { get; set; }
 }
 
-//public class Configs
-//{
-//    public string Type { get; set; }
-//    public Config Config { get; set; }
-//}
 
 [ProcessCard]
 public class Card
 {
     public string Type { get; set; }
+
     public Guid CardId { get; set; }
+
     public string Number { get; set; }
 
     public List<Shortcut> Shortcuts { get; set; }
@@ -36,25 +33,13 @@ public class Card
 
 }
 
-//public class CardResponse
-//{
-//    public IEnumerable<Card> CardHolderCards { get; set; }
-//    public IEnumerable<Card> AdditionalCards { get; set; }
-//    public IEnumerable<Card> TemporaryCards { get; set; }
-//}
 
 public static class ObjectProcessor
 {
-    //private static readonly List<Configs> ConfigsList = new List<Configs>
-    //{
-    //    new Configs { Type = "Holder", Config = new Config { Key = "1234", Value = "Holder Config Value" } },
-    //    new Configs { Type = "Additional", Config = new Config { Key = "9012", Value = "Additional Config Value" } },
-    //    new Configs { Type = "Temporary", Config = new Config { Key = "3456", Value = "Temporary Config Value" } }
-    //};
-
     public static void Process(object obj)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj));
+        if (obj == null)
+            throw new ArgumentNullException(nameof(obj));
 
         var type = obj.GetType();
         var properties = type.GetProperties();
@@ -63,22 +48,21 @@ public static class ObjectProcessor
         {
             if (!typeof(IEnumerable).IsAssignableFrom(property.PropertyType) ||
                 !property.PropertyType.IsGenericType) continue;
-            var itemType = property.PropertyType.GetGenericArguments()[0];
             
+            var itemType = property.PropertyType.GetGenericArguments()[0];
+
             if (itemType.GetCustomAttribute<ProcessCardAttribute>() == null)
                 continue;
-            
+
             var collection = (IEnumerable)property.GetValue(obj);
-            if (collection == null) 
+            if (collection == null)
                 continue;
-            
+
             var processedCollection = Activator.CreateInstance(
                 typeof(List<>).MakeGenericType(itemType)) as IList;
 
             foreach (var item in collection)
-            {
                 processedCollection?.Add(ProcessItem(item));
-            }
 
             property.SetValue(obj, processedCollection);
         }
@@ -92,6 +76,7 @@ public static class ObjectProcessor
         foreach (var property in type.GetProperties())
         {
             var value = property.GetValue(item);
+
             property.SetValue(newItem, value);
         }
 

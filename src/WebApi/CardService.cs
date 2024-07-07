@@ -18,13 +18,12 @@ public class CardService
 
     public async Task<CardResponse> GetCardAsync()
     {
-        var stop1 = new Stopwatch();
         var card = await _cardApi.GetCardAsync();
 
-        stop1.Start();
-        //card.Process();
-        stop1.Stop();
-        Console.WriteLine($"tempo: {stop1.ElapsedMilliseconds} ms");
+        
+
+
+      
         return card;
     }
 }

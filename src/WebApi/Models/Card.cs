@@ -22,6 +22,8 @@ namespace WebApi.Models
 public class CardResponse
 {
     public IEnumerable<Card> CardHolderCards { get; set; }
+    
     public IEnumerable<Card> AdditionalCards { get; set; }
+    
     public IEnumerable<Card> TemporaryCards { get; set; }
 }

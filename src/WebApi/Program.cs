@@ -7,6 +7,7 @@ using RestEase.HttpClientFactory;
 using WebApi.Converters;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,20 +47,32 @@ var customJsonSerializerSettings = new JsonSerializerSettings
 customJsonSerializerSettings.Converters.Add(new CardConverter());
 
 builder.Services
-    //.AddTransient(_ => new CustomResponseHandler())
-    //.AddRestEaseClient<ICardApi>("https://cards.free.beeceptor.com")
     .AddRestEaseClient<ICardApi>(c =>
     {
         c.JsonSerializerSettings = customJsonSerializerSettings;
     })
     .ConfigureHttpClient(client =>
     {
+        client.Timeout = TimeSpan.FromSeconds(30);
         client.BaseAddress = new Uri("https://cards.free.beeceptor.com");
         client.DefaultRequestHeaders.Add("Accept", "application/json");
-    });
-//.AddHttpMessageHandler<CustomResponseHandler>();
+    })
+    .AddTransientHttpErrorPolicy(builder =>
+        builder.WaitAndRetryAsync(new[]
+    {
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(3),
+        TimeSpan.FromSeconds(7),
+    }).WrapAsync(
+            
+            builder.CircuitBreakerAsync(
+            
+                handledEventsAllowedBeforeBreaking: 5,
+                durationOfBreak: TimeSpan.FromSeconds(30)
+            )));
 
 builder.Services.AddAzureAppConfiguration();
+
 var configsSection = builder.Configuration.GetSection("Configs")
     .Get<IEnumerable<Configs>>()
     .ToDictionary(cw => cw.Type, cw => cw.Config);
