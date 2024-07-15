@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using WebApi.Models;
+
 
 namespace WebApi.Models
 {
@@ -10,8 +10,11 @@ namespace WebApi.Models
         public Guid CardId { get; set; }
 
         public string Number { get; set; }
+        
         public override List<Shortcut> Shortcuts { get; set; }
+        
         public override List<Button> Buttons { get; set; }
+        
         public override void AddParams()
         {
             throw new NotImplementedException();
@@ -22,8 +25,8 @@ namespace WebApi.Models
 public class CardResponse
 {
     public IEnumerable<Card> CardHolderCards { get; set; }
-    
+
     public IEnumerable<Card> AdditionalCards { get; set; }
-    
+
     public IEnumerable<Card> TemporaryCards { get; set; }
 }

@@ -20,10 +20,6 @@ public class CardService
     {
         var card = await _cardApi.GetCardAsync();
 
-        
-
-
-      
         return card;
     }
 }
