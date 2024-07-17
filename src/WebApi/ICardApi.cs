@@ -4,6 +4,7 @@ namespace WebApi;
 
 public interface ICardApi
 {
-    [Get("/api/v2/cards?includeDebit=true")]
+    [Get("/api/v1/activeFunction")]
+    [AllowAnyStatusCode]
     Task<Response<CardResponse>> GetCardAsync();
 }

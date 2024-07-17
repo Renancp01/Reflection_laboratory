@@ -3,6 +3,7 @@ using Contracts;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using WebApi.Models;
+using WebApi.Extensions;
 
 namespace WebApi;
 
@@ -20,6 +21,8 @@ public class CardService
     {
         var card = await _cardApi.GetCardAsync();
 
-        return card;
+        await card.ProcessApiResponseAsync();
+
+        return new CardResponse();
     }
 }

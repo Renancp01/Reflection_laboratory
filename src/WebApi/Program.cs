@@ -54,7 +54,7 @@ builder.Services
     .ConfigureHttpClient(client =>
     {
         client.Timeout = TimeSpan.FromSeconds(30);
-        client.BaseAddress = new Uri("https://cards.free.beeceptor.com");
+        client.BaseAddress = new Uri("https://mpfe32a1d6d88276e0b7.free.beeceptor.com");
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     })
     .AddTransientHttpErrorPolicy(builder =>
