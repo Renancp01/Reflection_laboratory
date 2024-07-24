@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Filters;
 
+[AttributeUsage(AttributeTargets.All)]
 public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
 {
     private static readonly Dictionary<Type, Func<string, (bool IsValid, object Value)>> Validators = new()
@@ -14,44 +15,43 @@ public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var missingHeaders = new List<string>();
-        var invalidHeaders = new List<string>();
+        var missingOrInvalidHeaders = RequiredHeadersConfig.Headers
+            .Select(header => ValidateHeader(context, header))
+            .Where(result => result != null)
+            .ToList();
 
-        foreach (var header in RequiredHeadersConfig.Headers)
-        {
-            if (!context.HttpContext.Request.Headers.TryGetValue(header.Name, out var headerValue))
-            {
-                missingHeaders.Add(header.Name);
-            }
-            else if (!Validators.TryGetValue(header.Type, out var validator))
-            {
-                invalidHeaders.Add(header.Name);
-            }
-            else
-            {
-                var (isValid, parsedValue) = validator(headerValue);
-                if (isValid)
-                {
-                    context.HttpContext.Items[header.Name] = parsedValue;
-                }
-                else
-                {
-                    invalidHeaders.Add(header.Name);
-                }
-            }
-        }
-
-        if (missingHeaders.Count != 0 || invalidHeaders.Count != 0)
+        if (missingOrInvalidHeaders.Count != 0)
         {
             var errorResponse = new
             {
-                MissingHeaders = missingHeaders,
-                InvalidHeaders = invalidHeaders
+                Errors = missingOrInvalidHeaders
             };
             context.Result = new BadRequestObjectResult(errorResponse);
             return;
         }
 
         await next();
+    }
+
+    private static object ValidateHeader(ActionExecutingContext context, HeaderDefinition header)
+    {
+        if (!context.HttpContext.Request.Headers.TryGetValue(header.Name, out var headerValue))
+        {
+            return new { Header = header.Name, Error = "Missing" };
+        }
+
+        if (!Validators.TryGetValue(header.Type, out var validator))
+        {
+            return new { Header = header.Name, Error = "Invalid Type" };
+        }
+
+        var (isValid, parsedValue) = validator(headerValue);
+        if (!isValid)
+        {
+            return new { Header = header.Name, Error = "Invalid Value" };
+        }
+
+        context.HttpContext.Items[header.Name] = parsedValue;
+        return null;
     }
 }
