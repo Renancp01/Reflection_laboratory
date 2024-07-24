@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Contracts.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WebApi.Filters;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using Contracts.Filters;
 using WebApi.Filters;
 
 namespace WebApi;

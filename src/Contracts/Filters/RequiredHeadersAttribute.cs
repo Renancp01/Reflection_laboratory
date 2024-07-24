@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using WebApi.Filters;
 
-namespace WebApi.Filters;
+namespace Contracts.Filters;
 
 [AttributeUsage(AttributeTargets.All)]
 public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
