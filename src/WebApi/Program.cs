@@ -8,6 +8,7 @@ using WebApi.Converters;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using Polly;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,14 +82,19 @@ Singleton.Instance.SetValue(configsSection);
 builder.Services.AddTransient<Card>();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.OperationFilter<AddRequiredHeaderParameter>();
+});
 
 var app = builder.Build();
 app.UseAzureAppConfiguration();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
+    
 }
 
 app.UseHttpsRedirection();

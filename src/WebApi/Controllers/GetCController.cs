@@ -1,31 +1,31 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Contracts;
-using Microsoft.AspNetCore.Http;
+﻿using Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using WebApi.Models;
+using WebApi.Filters;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GetCController : ControllerBase
+    public class GetCController(IConfiguration configuration, CardService cardService) : ControllerBase
     {
-        private readonly CardService _cardService;
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration = configuration;
 
-        public GetCController(IConfiguration configuration, CardService cardService)
-        {
-            _configuration = configuration;
-            _cardService = cardService;
-        }
-
-        [HttpGet()]
+        [HttpGet("AAA")]
         public async Task<IActionResult> Get([FromServices] IOptions<Settings> settings)
         {
 
-            var card = await _cardService.GetCardAsync();
+            var card = await cardService.GetCardAsync();
+            //var a = settings.Value;
+            //var c = new Card();
+            return Ok(card);
+        }
+
+        [HttpGet(Name = "LALALA")]
+        [RequiredHeaders]
+        public async Task<IActionResult> LALALA()
+        {
+            var card = await cardService.GetCardAsync();
             //var a = settings.Value;
             //var c = new Card();
             return Ok(card);
