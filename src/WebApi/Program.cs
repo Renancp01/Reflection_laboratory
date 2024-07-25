@@ -1,5 +1,6 @@
 
 using Contracts;
+using Contracts.Filters;
 using WebApi;
 
 
@@ -47,7 +48,8 @@ var customJsonSerializerSettings = new JsonSerializerSettings
 
 customJsonSerializerSettings.Converters.Add(new CardConverter());
 
-builder.Services.AddScoped<SpecificHeadersFilter>();
+builder.Services.AddScoped<IRequiredHeadersFilter, SpecificHeadersFilter>();
+builder.Services.AddScoped<IRequiredHeadersFilter, SpecificHeadersFilter1>();
 
 builder.Services
     .AddRestEaseClient<ICardApi>(c =>
@@ -67,9 +69,9 @@ builder.Services
         TimeSpan.FromSeconds(3),
         TimeSpan.FromSeconds(7),
     }).WrapAsync(
-            
+
             builder.CircuitBreakerAsync(
-            
+
                 handledEventsAllowedBeforeBreaking: 5,
                 durationOfBreak: TimeSpan.FromSeconds(30)
             )));
@@ -96,7 +98,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
-    
+
 }
 
 app.UseHttpsRedirection();

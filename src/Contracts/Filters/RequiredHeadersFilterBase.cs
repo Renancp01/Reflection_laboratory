@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Contracts.Filters;
 
 [AttributeUsage(AttributeTargets.All)]
-public abstract class RequiredHeadersAttribute : Attribute, IRequiredHeadersFilter
+public abstract class RequiredHeadersFilterBase : Attribute, IRequiredHeadersFilter
 {
     public abstract List<HeaderDefinition> Headers { get; }
 

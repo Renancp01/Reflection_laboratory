@@ -2,7 +2,7 @@
 
 namespace WebApi;
 
-public class SpecificHeadersFilter : RequiredHeadersAttribute
+public class SpecificHeadersFilter : RequiredHeadersFilterBase
 {
     public override List<HeaderDefinition> Headers =>
     [
@@ -10,6 +10,4 @@ public class SpecificHeadersFilter : RequiredHeadersAttribute
         new("TesteInt", typeof(int)),
         new("TesteEnum", typeof(MyEnum))
     ];
-
-    public List<HeaderDefinition> GetHeaders() => Headers;
 }

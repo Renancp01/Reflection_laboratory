@@ -1,31 +1,43 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.Extensions.Options;
+using Contracts.Filters;
 
 namespace WebApi;
 
-public class AddRequiredHeaderParameter(IOptions<SpecificHeadersFilter> headerConfig) : IOperationFilter
+public class AddRequiredHeaderParameter : IOperationFilter
 {
-    private readonly SpecificHeadersFilter _headerConfig = headerConfig.Value;
+    private readonly IServiceProvider _serviceProvider;
 
+    public AddRequiredHeaderParameter(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var headerFilters = scope.ServiceProvider.GetServices<IRequiredHeadersFilter>();
+
         operation.Parameters ??= new List<OpenApiParameter>();
-        
-        foreach (var header in _headerConfig.Headers)
+
+        foreach (var headerFilter in headerFilters)
         {
-            operation.Parameters.Add(new OpenApiParameter
+            foreach (var header in headerFilter.Headers)
             {
-                Name = header.Name,
-                In = ParameterLocation.Header,
-                Required = true,
-                Schema = new OpenApiSchema
+                operation.Parameters.Add(new OpenApiParameter
                 {
-                    Type = GetOpenApiType(header.Type)
-                }
-            });
+                    Name = header.Name,
+                    In = ParameterLocation.Header,
+                    Required = true,
+                    Schema = new OpenApiSchema
+                    {
+                        Type = GetOpenApiType(header.Type)
+                    }
+                });
+            }
         }
     }
+
     private static string GetOpenApiType(Type type)
     {
         if (type == typeof(string))

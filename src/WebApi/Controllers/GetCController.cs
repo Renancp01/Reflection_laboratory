@@ -23,7 +23,7 @@ namespace WebApi.Controllers
 
         [HttpGet(Name = "LALALA")]
         [ServiceFilter(typeof(SpecificHeadersFilter))]
-        //[ServiceFilter(typeof(SpecificHeadersFilter))]
+        [ServiceFilter(typeof(SpecificHeadersFilter1))]
         public async Task<IActionResult> LALALA()
         {
             var card = await cardService.GetCardAsync();

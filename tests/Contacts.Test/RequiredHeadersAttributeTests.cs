@@ -8,7 +8,7 @@ namespace Contacts.Test;
 
 public class RequiredHeadersAttributeTests
 {
-    private readonly RequiredHeadersAttribute _attribute;
+    private readonly RequiredHeadersFilterBase _attribute;
 
     //public RequiredHeadersAttributeTests()
     //{
