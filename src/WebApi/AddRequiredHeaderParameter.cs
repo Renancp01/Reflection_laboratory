@@ -1,26 +1,18 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
-using Contracts.Filters;
-using WebApi.Filters;
+using Microsoft.Extensions.Options;
 
 namespace WebApi;
 
-public class AddRequiredHeaderParameter : IOperationFilter
+public class AddRequiredHeaderParameter(IOptions<SpecificHeadersFilter> headerConfig) : IOperationFilter
 {
+    private readonly SpecificHeadersFilter _headerConfig = headerConfig.Value;
+
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var methodInfo = context.MethodInfo;
-
-        var requiredHeadersAttribute = methodInfo.GetCustomAttribute<RequiredHeadersAttribute>();
-        if (requiredHeadersAttribute is null)
-            return;
-
-        var requiredHeaders = RequiredHeadersConfig.Headers;
-
         operation.Parameters ??= new List<OpenApiParameter>();
-
-        foreach (var header in requiredHeaders)
+        
+        foreach (var header in _headerConfig.Headers)
         {
             operation.Parameters.Add(new OpenApiParameter
             {
@@ -48,6 +40,7 @@ public class AddRequiredHeaderParameter : IOperationFilter
         {
             return "string";
         }
+
         throw new NotSupportedException($"Type '{type.Name}' is not supported.");
     }
 }

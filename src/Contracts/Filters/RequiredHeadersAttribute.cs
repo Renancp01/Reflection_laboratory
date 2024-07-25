@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Contracts.Notifications;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using WebApi.Filters;
 
 namespace Contracts.Filters;
 
 [AttributeUsage(AttributeTargets.All)]
-public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
+public abstract class RequiredHeadersAttribute : Attribute, IRequiredHeadersFilter
 {
+    public abstract List<HeaderDefinition> Headers { get; }
+
     private static readonly Dictionary<Type, Func<string, (bool IsValid, object Value)>> Validators = new()
     {
         { typeof(string), value => (true, value) },
@@ -16,12 +18,12 @@ public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var missingOrInvalidHeaders = RequiredHeadersConfig.Headers
+        var missingOrInvalidHeaders = Headers
             .Select(header => ValidateHeader(context, header))
             .Where(result => result != null)
             .ToList();
 
-        if (missingOrInvalidHeaders.Count != 0)
+        if (missingOrInvalidHeaders.Any())
         {
             var errorResponse = new
             {
@@ -38,7 +40,9 @@ public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
     {
         if (!context.HttpContext.Request.Headers.TryGetValue(header.Name, out var headerValue))
         {
-            return new { Header = header.Name, Error = "Missing" };
+            //return /*new { Header = header.Name, Error = "Missing" };*/
+
+            return new Error("BadRequest", "");
         }
 
         if (!Validators.TryGetValue(header.Type, out var validator))
@@ -55,4 +59,6 @@ public class RequiredHeadersAttribute : Attribute, IAsyncActionFilter
         context.HttpContext.Items[header.Name] = parsedValue;
         return null;
     }
+
+
 }

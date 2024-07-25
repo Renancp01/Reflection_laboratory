@@ -47,6 +47,8 @@ var customJsonSerializerSettings = new JsonSerializerSettings
 
 customJsonSerializerSettings.Converters.Add(new CardConverter());
 
+builder.Services.AddScoped<SpecificHeadersFilter>();
+
 builder.Services
     .AddRestEaseClient<ICardApi>(c =>
     {

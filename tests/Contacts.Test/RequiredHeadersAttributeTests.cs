@@ -10,10 +10,10 @@ public class RequiredHeadersAttributeTests
 {
     private readonly RequiredHeadersAttribute _attribute;
 
-    public RequiredHeadersAttributeTests()
-    {
-        _attribute = new RequiredHeadersAttribute();
-    }
+    //public RequiredHeadersAttributeTests()
+    //{
+    //    _attribute = new RequiredHeadersAttribute();
+    //}
     [Fact]
     public async Task OnActionExecutionAsync_AllHeadersPresent_ShouldProceed()
     {

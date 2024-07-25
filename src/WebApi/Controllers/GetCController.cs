@@ -2,7 +2,6 @@
 using Contracts.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using WebApi.Filters;
 
 namespace WebApi.Controllers
 {
@@ -23,7 +22,8 @@ namespace WebApi.Controllers
         }
 
         [HttpGet(Name = "LALALA")]
-        [RequiredHeaders]
+        [ServiceFilter(typeof(SpecificHeadersFilter))]
+        //[ServiceFilter(typeof(SpecificHeadersFilter))]
         public async Task<IActionResult> LALALA()
         {
             var card = await cardService.GetCardAsync();

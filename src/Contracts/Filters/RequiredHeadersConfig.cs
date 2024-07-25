@@ -1,16 +1,14 @@
-﻿using System;
+﻿namespace Contracts.Filters;
 
-namespace WebApi.Filters;
-
-public static class RequiredHeadersConfig
-{
-    public static readonly List<HeaderDefinition> Headers =
-    [
-        new HeaderDefinition("Teste", typeof(string)),
-        new HeaderDefinition("TesteInt", typeof(int)),
-        new HeaderDefinition("TesteEnum", typeof(MyEnum))
-    ];
-}
+//public static class RequiredHeadersConfig
+//{
+//    public static readonly List<HeaderDefinition> Headers =
+//    [
+//        new HeaderDefinition("Teste", typeof(string)),
+//        new HeaderDefinition("TesteInt", typeof(int)),
+//        new HeaderDefinition("TesteEnum", typeof(MyEnum))
+//    ];
+//}
 
 public class HeaderDefinition(string name, Type type)
 {
