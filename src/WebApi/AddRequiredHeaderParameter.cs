@@ -1,6 +1,8 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Contracts.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace WebApi;
 
@@ -12,8 +14,21 @@ public class AddRequiredHeaderParameter : IOperationFilter
     {
         _serviceProvider = serviceProvider;
     }
+
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        if (context.ApiDescription.ActionDescriptor is ControllerActionDescriptor actionDescriptor)
+        {
+            var hasServiceFilter = actionDescriptor.MethodInfo
+                .GetCustomAttributes(typeof(ServiceFilterAttribute), true)
+                .Any();
+
+            if (!hasServiceFilter)
+            {
+                return;
+            }
+        }
+
         using var scope = _serviceProvider.CreateScope();
         var headerFilters = scope.ServiceProvider.GetServices<IRequiredHeadersFilter>();
 

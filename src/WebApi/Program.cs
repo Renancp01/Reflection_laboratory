@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using Polly;
 using Microsoft.OpenApi.Models;
+using WebApi.Invoice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,18 +22,21 @@ builder.Configuration.AddAzureAppConfiguration(op =>
 {
     op.Connect(connectionString)
         // Load all keys that start with `WebDemo:` and have no label
-        .Select("Config:*")
+        // .Select("Config:*")
+        .Select("*")
         // Configure to reload configuration if the registered key 'WebDemo:Sentinel' is modified.
         // Use the default cache expiration of 30 seconds. It can be overriden via AzureAppConfigurationRefreshOptions.SetCacheExpiration.
         .ConfigureRefresh(refreshOptions =>
         {
             refreshOptions.Register("Config:Virtual", refreshAll: true);
+            refreshOptions.Register("ConfigInvoice", refreshAll: true);
             refreshOptions.Register("Configs", refreshAll: true);
             refreshOptions.SetCacheExpiration(TimeSpan.FromHours(2));
         })
         .UseFeatureFlags();
 });
 
+builder.Services.Configure<InvoiceSettings>(builder.Configuration.GetSection("InvoiceSettings"));
 builder.Services.Configure<Settings>(builder.Configuration.GetSection("Config:Virtual"));
 builder.Services.Configure<Configs>(builder.Configuration.GetSection("Configs"));
 
@@ -81,6 +85,10 @@ builder.Services.AddAzureAppConfiguration();
 var configsSection = builder.Configuration.GetSection("Configs")
     .Get<IEnumerable<Configs>>()
     .ToDictionary(cw => cw.Type, cw => cw.Config);
+
+// var invoice = builder.Configuration.GetSection("ConfigInvoice")
+//     .Bind(new InvoiceSettings();
+
 
 Singleton.Instance.SetValue(configsSection);
 builder.Services.AddTransient<Card>();
